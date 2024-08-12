@@ -1,2 +1,2 @@
 # Arc_API
-an UNOFICAL arc api
+An UNOFFICIAL Arc browser API made for python.
