@@ -21,7 +21,7 @@ class arc_API:
         path = path_separator.join((os.getenv("LOCALAPPDATA"), "Packages")) if isWindows else path_separator.join((os.getenv("HOME"), "Library", "Application Support"))
         dirs = os.listdir(path)
 
-        arc_path = 
+        arc_path = path
         # if not Mac, use Windows paths
         if isWindows:
             for dir in dirs:
