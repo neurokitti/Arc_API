@@ -1,6 +1,6 @@
 from tkinter import *
 from tkinter import colorchooser, messagebox
-import os, types, json, psutil
+import os, json, psutil
 
 def setting_wrapper_function(func):
     def inner_wrapper(self, *args, **kwargs):
