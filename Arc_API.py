@@ -77,6 +77,7 @@ class arc_API:
         
         return self.spaces_data
     def set_space_theme_color(self,space_id, type, rgba,mode, noiseFactor=0.3,intensityFactor=0.1,):
+        print(rgba)
         if self.get_space_theme_type(space_id) != None:
             if isinstance(rgba, tuple):
                 rgba = [rgba]
@@ -100,14 +101,18 @@ class arc_API:
                 }
             if type == "blendedSingleColor":
                 r,g,b,a = rgba[0]
+                print("A:",a)
+                print("b:",b)
+                print("g:",g)
+                print("r:",r)
                 if (not "blendedSingleColor" in self.gradientData):
                     self.gradientData["blendedSingleColor"] = self.gradientData.pop("blendedGradient")
                 self.gradientData["blendedSingleColor"]["_0"] = {
                     "color": {
                     "alpha" : a,
-                    "green" : r,
-                    "blue" : g,
-                    "red" : b,
+                    "green" : g / 255,
+                    "blue" : b / 255,
+                    "red" : r / 255,
                     "colorSpace" : "extendedSRGB"
                     },
                     "modifiers" : {
@@ -141,7 +146,6 @@ class arc_API:
     def get_space_theme_data(self, space_id):
         if space_id < self.get_number_of_spaces():
             return self.spaces_data[space_id]['space_theme_data']
-        
     @setting_wrapper_function
     def set_space_name(self, space_id, space_name):
         if space_id < self.get_number_of_spaces():
@@ -198,7 +202,7 @@ class arc_API:
 if __name__ == "__main__":
     arc_api = arc_API()
     arc_api.close_arc()
-    arc_api.set_space_theme_color(0,"blendedSingleColor",[(255,0,255,1),(0,255,0,1)],"dark")
+    arc_api.set_space_theme_color(0,"blendedSingleColor",[(255,0,255,1)],"light")
     print(arc_api.get_number_of_spaces())
     arc_api.set_space_name(0, "aaaaaaaaaaaaaaaaaaaaaaaaa")
     arc_api.set_space_icon(0, '😍')
