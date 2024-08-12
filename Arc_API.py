@@ -1,6 +1,6 @@
 from tkinter import *
 from tkinter import colorchooser, messagebox
-import os, json, psutil
+import os, types, json, psutil
 
 def setting_wrapper_function(func):
     def inner_wrapper(self, *args, **kwargs):
@@ -14,16 +14,22 @@ def setting_wrapper_function(func):
 
 class arc_API:
     def __init__(self):
-        path = os.getenv('LOCALAPPDATA') + "\Packages\\"
+        # in the future, if the app ever comes to linux, this might need to use the `platform` library to differentiate from Mac and Linux, but this should be fine for now
+        isWindows = os.name == "nt"
+        path_separator = '\\' if isWindows else '/'
+
+        path = path_separator.join((os.getenv("LOCALAPPDATA"), "Packages")) if isWindows else path_separator.join((os.getenv("HOME"), "Library", "Application Support"))
         dirs = os.listdir(path)
 
-        arc_path = ""
-        for dir in dirs:
-            if not os.path.isfile(dir):
-                if "TheBrowserCompany" in dir:
-                    arc_path = os.path.join(path, dir)
+        arc_path = 
+        # if not Mac, use Windows paths
+        if isWindows:
+            for dir in dirs:
+                if not os.path.isfile(dir):
+                    if "TheBrowserCompany" in dir:
+                        arc_path = path_separator.join((os.path.join(path, dir), "LocalCache", "Local"))
 
-        self.arc_theme_file = f"{arc_path}\LocalCache\Local\Arc\StorableSidebar.json"
+        self.arc_theme_file = path_separator.join((arc_path, "Arc", "StorableSidebar.json"))
         self.data = ""
         with open(self.arc_theme_file, 'r', encoding='utf-8') as f:
             self.data = json.loads(f.read())
