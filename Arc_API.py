@@ -4,7 +4,6 @@ import os, json, psutil
 import subprocess
 import time
 
-
 def setting_wrapper_function(func):
     def inner_wrapper(self, *args, **kwargs):
         if self.arc_open_check():
@@ -32,6 +31,7 @@ class arc_API:
         # finalize true Arc path
         arc_path = path_separator.join((arc_path, "Arc"))
         self.arc_theme_file = path_separator.join((arc_path, "StorableSidebar.json"))
+        self.arc_executable = "Arc.exe" if isWindows else "Arc"
         self.data = ""
         with open(self.arc_theme_file, 'r', encoding='utf-8') as f:
             self.data = json.loads(f.read())
@@ -153,7 +153,7 @@ class arc_API:
             space_id = self.index_json_index(space_id)
             self.data["sidebar"]["containers"][1]["spaces"][space_id]["customInfo"]['iconType'] = {'emoji_v2': icon, 'emoji': 0}
     def arc_open_check(self):
-        if "Arc.exe" in (p.name() for p in psutil.process_iter()):
+        if self.arc_executable in (p.name() for p in psutil.process_iter()):
             print("Arc is still open! In order to change your theme, please close Arc and try again.")
             return True
         return False
@@ -171,18 +171,27 @@ class arc_API:
 
         return False
     def close_arc(self,):
-        subprocess.call(["TASKKILL", "/IM", "Arc.exe"])
+        if isWindows:
+            subprocess.Popen(["TASKKILL", "/IM", self.arc_executable])
+        else:
+            subprocess.Popen(f"osascript -e 'quit app \"{self.arc_executable}\"'", shell=True)
         print("start")
-        while self.is_application_running("Arc.exe"):
+        while self.is_application_running(self.arc_executable):
             time.sleep(0.1)
         print("done")
 
     def kill_arc(self,):
-        subprocess.call(["TASKKILL", "/F", "/IM", "Arc.exe"])
+        if isWindows:
+            subprocess.call(["TASKKILL", "/F", "/IM", self.arc_executable])
+        else:
+            subprocess.Popen(f"pkill -x {self.arc_executable}", shell=True)
 
 
     def open_arc(self,):
-        subprocess.Popen(['arc.exe'])
+        if isWindows:
+            subprocess.Popen([self.arc_executable])
+        else:
+            subprocess.Popen(f"osascript -e 'tell application \"{self.arc_executable}\" to activate'", shell=True)
 
 
 
