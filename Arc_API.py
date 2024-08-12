@@ -1,9 +1,8 @@
 from tkinter import *
+from tkinter import colorchooser, messagebox
 import os, json, psutil
-import win32gui
-import win32con
-import subprocess
-import time
+
+
 def setting_wrapper_function(func):
     def inner_wrapper(self, *args, **kwargs):
         if self.arc_open_check():
@@ -165,47 +164,10 @@ class arc_API:
             print("Arc is still open! In order to change your theme, please close Arc and try again.")
             return True
         return False
-    def is_application_running(self,app_name):
-        """
-        Check if a process with the given name is running.
-        
-        :param app_name: The name of the application/process to check (e.g., 'notepad.exe').
-        :return: True if the application is running, False otherwise.
-        """
-        for process in psutil.process_iter(['name']):
-            print(process.info['name'])
-            if process.info['name'] == app_name:
-                return True
-                
-        return False
-    def close_arc(self,):
-        try:
-            def enum_windows_callback(hwnd, wildcard):
-                if win32gui.IsWindowVisible(hwnd) and win32gui.GetWindowText(hwnd).strip().lower() == wildcard.lower():
-                    win32gui.PostMessage(hwnd, win32con.WM_CLOSE, 0, 0)
-
-
-            win32gui.EnumWindows(enum_windows_callback, "arc")
-            
-        except ImportError:
-            pass
-        print("start")
-        while self.is_application_running("Arc.exe"):
-            time.sleep(0.1)
-        print("done")
-
-    def kill_arc(self,):
-        subprocess.call("TASKKILL /F /IM arc.exe", shell=True)
-
-
-    def open_arc(self,):
-        subprocess.Popen(['arc.exe'])
-
 
 
 if __name__ == "__main__":
     arc_api = arc_API()
-    arc_api.close_arc()
     arc_api.set_space_theme_color(0,"blendedSingleColor",[(255,0,255,1),(0,255,0,1)],"dark")
     print(arc_api.get_number_of_spaces())
     arc_api.set_space_name(0, "aaaaaaaaaaaaaaaaaaaaaaaaa")
