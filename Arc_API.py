@@ -29,7 +29,9 @@ class arc_API:
                     if "TheBrowserCompany" in dir:
                         arc_path = path_separator.join((os.path.join(path, dir), "LocalCache", "Local"))
 
-        self.arc_theme_file = path_separator.join((arc_path, "Arc", "StorableSidebar.json"))
+        arc_path = path_separator.join((arc_path, "Arc"))
+
+        self.arc_theme_file = path_separator.join((arc_path, "StorableSidebar.json"))
         self.data = ""
         with open(self.arc_theme_file, 'r', encoding='utf-8') as f:
             self.data = json.loads(f.read())
