@@ -1,8 +1,6 @@
 from tkinter import *
 from tkinter import colorchooser, messagebox
 import os, json, psutil
-import win32gui
-import win32con
 import subprocess
 import time
 
@@ -165,23 +163,14 @@ class arc_API:
 
         return False
     def close_arc(self,):
-        try:
-            def enum_windows_callback(hwnd, wildcard):
-                if win32gui.IsWindowVisible(hwnd) and win32gui.GetWindowText(hwnd).strip().lower() == wildcard.lower():
-                    win32gui.PostMessage(hwnd, win32con.WM_CLOSE, 0, 0)
-
-
-            win32gui.EnumWindows(enum_windows_callback, "arc")
-
-        except ImportError:
-            pass
+        subprocess.call(["TASKKILL", "/IM", "Arc.exe"])
         print("start")
         while self.is_application_running("Arc.exe"):
             time.sleep(0.1)
         print("done")
 
     def kill_arc(self,):
-        subprocess.call("TASKKILL /F /IM arc.exe", shell=True)
+        subprocess.call(["TASKKILL", "/F", "/IM", "Arc.exe"])
 
 
     def open_arc(self,):
