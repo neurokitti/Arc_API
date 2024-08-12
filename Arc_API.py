@@ -18,14 +18,22 @@ def setting_wrapper_function(func):
     return inner_wrapper
 class arc_API:
     def __init__(self):
-        path = os.getenv('LOCALAPPDATA') + "\Packages\\"
+        # following is useful for compatibility with MacOS
+        isWindows = os.name == "nt"
+        path_separator = '\\' if isWindows else '/'
+        # use join function for easier string manipulation + performance
+        path = path_separator.join((os.getenv("LOCALAPPDATA"), "Packages")) if isWindows else path_separator.join((os.getenv("HOME"), "Library", "Application Support"))
         dirs = os.listdir(path)
-        arc_path = ""
-        for dir in dirs:
-            if not os.path.isfile(dir):
-                if "TheBrowserCompany" in dir:
-                    arc_path = os.path.join(path, dir)
-        self.arc_theme_file = f"{arc_path}\LocalCache\Local\Arc\StorableSidebar.json"
+        arc_path = path
+        # if not Mac, use Windows paths
+        if isWindows:
+            for dir in dirs:
+                if not os.path.isfile(dir):
+                    if "TheBrowserCompany" in dir:
+                        arc_path = path_separator.join((os.path.join(path, dir), "LocalCache", "Local"))
+        # finalize true Arc path
+        arc_path = path_separator.join((arc_path, "Arc"))
+        self.arc_theme_file = path_separator.join((arc_path, "StorableSidebar.json"))
         self.data = ""
         with open(self.arc_theme_file, 'r', encoding='utf-8') as f:
             self.data = json.loads(f.read())
