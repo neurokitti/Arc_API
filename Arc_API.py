@@ -16,14 +16,14 @@ def setting_wrapper_function(func):
 class arc_API:
     def __init__(self):
         # following is useful for compatibility with MacOS
-        isWindows = os.name == "nt"
-        path_separator = '\\' if isWindows else '/'
+        self.isWindows = os.name == "nt"
+        path_separator = '\\' if self.isWindows else '/'
         # use join function for easier string manipulation + performance
-        path = path_separator.join((os.getenv("LOCALAPPDATA"), "Packages")) if isWindows else path_separator.join((os.getenv("HOME"), "Library", "Application Support"))
+        path = path_separator.join((os.getenv("LOCALAPPDATA"), "Packages")) if self.isWindows else path_separator.join((os.getenv("HOME"), "Library", "Application Support"))
         dirs = os.listdir(path)
         arc_path = path
         # if not Mac, use Windows paths
-        if isWindows:
+        if self.isWindows:
             for dir in dirs:
                 if not os.path.isfile(dir):
                     if "TheBrowserCompany" in dir:
@@ -31,7 +31,7 @@ class arc_API:
         # finalize true Arc path
         arc_path = path_separator.join((arc_path, "Arc"))
         self.arc_theme_file = path_separator.join((arc_path, "StorableSidebar.json"))
-        self.arc_executable = "Arc.exe" if isWindows else "Arc"
+        self.arc_executable = "Arc.exe" if self.isWindows else "Arc"
         self.data = ""
         with open(self.arc_theme_file, 'r', encoding='utf-8') as f:
             self.data = json.loads(f.read())
@@ -175,7 +175,7 @@ class arc_API:
 
         return False
     def close_arc(self,):
-        if isWindows:
+        if self.isWindows:
             subprocess.Popen(["TASKKILL", "/IM", self.arc_executable])
         else:
             subprocess.Popen(f"osascript -e 'quit app \"{self.arc_executable}\"'", shell=True)
@@ -185,14 +185,14 @@ class arc_API:
         print("done")
 
     def kill_arc(self,):
-        if isWindows:
+        if self.isWindows:
             subprocess.call(["TASKKILL", "/F", "/IM", self.arc_executable])
         else:
             subprocess.Popen(f"pkill -x {self.arc_executable}", shell=True)
 
 
     def open_arc(self,):
-        if isWindows:
+        if self.isWindows:
             subprocess.Popen([self.arc_executable])
         else:
             subprocess.Popen(f"osascript -e 'tell application \"{self.arc_executable}\" to activate'", shell=True)
