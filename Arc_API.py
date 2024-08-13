@@ -41,36 +41,43 @@ class arc_API:
         json_data = self.data["sidebar"]["containers"][1]
         index_proper = 0 
         self.spaces_data = []
-        for index, i in enumerate(json_data["spaces"]):
+        for index, space_data in enumerate(json_data["spaces"]):
             if index % 2 != 0:  # Check if the number is odd
+                space_name = None
                 space_theme = None
                 space_theme_data = None
-                if 'windowTheme' not in i["customInfo"]:
+                if 'windowTheme' not in space_data["customInfo"]:
                     #print("empty_theme")
-                    #print("AAAAAA:",i)
+                    #print("AAAAAA:",space_data)
                     space_theme = None
                     space_theme_data = None
-                elif 'blendedSingleColor' in i["customInfo"]['windowTheme']["background"]["single"]["_0"]["style"]["color"]["_0"]:
+                elif 'blendedSingleColor' in space_data["customInfo"]['windowTheme']["background"]["single"]["_0"]["style"]["color"]["_0"]:
                     #print("has blendedSingleColor")
                     space_theme = "blendedSingleColor"
-                    space_theme_data = i["customInfo"]['windowTheme']["background"]["single"]["_0"]["style"]["color"]["_0"]
-                elif 'blendedGradient' in i["customInfo"]['windowTheme']["background"]["single"]["_0"]["style"]["color"]["_0"]:
+                    space_theme_data = space_data["customInfo"]['windowTheme']["background"]["single"]["_0"]["style"]["color"]["_0"]
+                elif 'blendedGradient' in space_data["customInfo"]['windowTheme']["background"]["single"]["_0"]["style"]["color"]["_0"]:
                     #print("has blendedGradient")
                     space_theme = "blendedGradient"
-                    space_theme_data = i["customInfo"]['windowTheme']["background"]["single"]["_0"]["style"]["color"]["_0"]
+                    space_theme_data = space_data["customInfo"]['windowTheme']["background"]["single"]["_0"]["style"]["color"]["_0"]
                 
-                if "iconType" in i["customInfo"]:
-                        #print("has icon")
-                        icon = i["customInfo"]['iconType']
-                elif "iconType" not in i["customInfo"]:
-                        #print("has no icon")
-                        icon = None
+                if "iconType" in space_data["customInfo"]:
+                    #print("has icon")
+                    icon = space_data["customInfo"]['iconType']
+                elif "iconType" not in space_data["customInfo"]:
+                    #print("has no icon")
+                    icon = None
+
+                if "title" in space_data:
+                    # only if space has a name
+                    space_name = space_data['title']
+
                 data = {"space_id": index_proper,
-                    "space_name":i['title'],
-                    "space_theme_type":space_theme,
+                    "space_name": space_name,
+                    "space_theme_type": space_theme,
                     "space_theme_data": space_theme_data,
-                    "space_icon":icon,
+                    "space_icon": icon,
                     }
+                    
                 
                 self.spaces_data.append(data)
                 index_proper +=1
