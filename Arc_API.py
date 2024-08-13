@@ -146,7 +146,11 @@ class arc_API:
         return len(self.spaces_data)
     def get_space_name(self, space_id):
         if space_id < self.get_number_of_spaces():
-            return self.spaces_data[space_id]['space_name']
+            # if there is no space_name, can't get one
+            if "space_name" in self.spaces_data[space_id]:
+                return self.spaces_data[space_id]['space_name']
+            else:
+                return None
     def get_space_theme_type(self, space_id):
         if space_id < self.get_number_of_spaces():
             return self.spaces_data[space_id]['space_theme_type']
@@ -156,8 +160,10 @@ class arc_API:
     @setting_wrapper_function
     def set_space_name(self, space_id, space_name):
         if space_id < self.get_number_of_spaces():
-            space_id = self.index_json_index(space_id)
-            self.data["sidebar"]["containers"][1]["spaces"][space_id]['title'] = str(space_name)
+            # if there is no space_name, then can't set one
+            if space_name:
+                space_id = self.index_json_index(space_id)
+                self.data["sidebar"]["containers"][1]["spaces"][space_id]['title'] = str(space_name)
     @setting_wrapper_function
     def set_space_icon(self, space_id, icon):
         if space_id < self.get_number_of_spaces():
