@@ -176,7 +176,7 @@ class arc_API:
         return False
     def close_arc(self,):
         if self.isWindows:
-            subprocess.Popen(["TASKKILL", "/IM", self.arc_executable])
+            subprocess.Popen(f"TASKKILL /IM {self.arc_executable}", shell=True)
         else:
             subprocess.Popen(f"osascript -e 'quit app \"{self.arc_executable}\"'", shell=True)
         print("start")
@@ -186,13 +186,13 @@ class arc_API:
 
     def kill_arc(self,):
         if self.isWindows:
-            subprocess.call(["TASKKILL", "/F", "/IM", self.arc_executable])
+            subprocess.call(f"TASKKILL /F /IM {self.arc_executable}", shell=True)
         else:
             subprocess.Popen(f"pkill -x {self.arc_executable}", shell=True)
 
 
     def open_arc(self,):
         if self.isWindows:
-            subprocess.Popen([self.arc_executable])
+            subprocess.Popen(self.arc_executable, shell=True)
         else:
             subprocess.Popen(f"osascript -e 'tell application \"{self.arc_executable}\" to activate'", shell=True)
