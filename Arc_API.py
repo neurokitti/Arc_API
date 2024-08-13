@@ -1,11 +1,8 @@
 from tkinter import *
 from tkinter import colorchooser, messagebox
 import os, json, psutil
-import win32gui
-import win32con
 import subprocess
 import time
-
 
 def setting_wrapper_function(func):
     def inner_wrapper(self, *args, **kwargs):
@@ -18,14 +15,23 @@ def setting_wrapper_function(func):
     return inner_wrapper
 class arc_API:
     def __init__(self):
-        path = os.getenv('LOCALAPPDATA') + "\Packages\\"
+        # following is useful for compatibility with MacOS
+        isWindows = os.name == "nt"
+        path_separator = '\\' if isWindows else '/'
+        # use join function for easier string manipulation + performance
+        path = path_separator.join((os.getenv("LOCALAPPDATA"), "Packages")) if isWindows else path_separator.join((os.getenv("HOME"), "Library", "Application Support"))
         dirs = os.listdir(path)
-        arc_path = ""
-        for dir in dirs:
-            if not os.path.isfile(dir):
-                if "TheBrowserCompany" in dir:
-                    arc_path = os.path.join(path, dir)
-        self.arc_theme_file = f"{arc_path}\LocalCache\Local\Arc\StorableSidebar.json"
+        arc_path = path
+        # if not Mac, use Windows paths
+        if isWindows:
+            for dir in dirs:
+                if not os.path.isfile(dir):
+                    if "TheBrowserCompany" in dir:
+                        arc_path = path_separator.join((os.path.join(path, dir), "LocalCache", "Local"))
+        # finalize true Arc path
+        arc_path = path_separator.join((arc_path, "Arc"))
+        self.arc_theme_file = path_separator.join((arc_path, "StorableSidebar.json"))
+        self.arc_executable = "Arc.exe" if isWindows else "Arc"
         self.data = ""
         with open(self.arc_theme_file, 'r', encoding='utf-8') as f:
             self.data = json.loads(f.read())
@@ -151,7 +157,7 @@ class arc_API:
             space_id = self.index_json_index(space_id)
             self.data["sidebar"]["containers"][1]["spaces"][space_id]["customInfo"]['iconType'] = {'emoji_v2': icon, 'emoji': 0}
     def arc_open_check(self):
-        if "Arc.exe" in (p.name() for p in psutil.process_iter()):
+        if self.arc_executable in (p.name() for p in psutil.process_iter()):
             print("Arc is still open! In order to change your theme, please close Arc and try again.")
             return True
         return False
@@ -169,37 +175,24 @@ class arc_API:
 
         return False
     def close_arc(self,):
-        try:
-            def enum_windows_callback(hwnd, wildcard):
-                if win32gui.IsWindowVisible(hwnd) and win32gui.GetWindowText(hwnd).strip().lower() == wildcard.lower():
-                    win32gui.PostMessage(hwnd, win32con.WM_CLOSE, 0, 0)
-
-
-            win32gui.EnumWindows(enum_windows_callback, "arc")
-
-        except ImportError:
-            pass
+        if isWindows:
+            subprocess.Popen(["TASKKILL", "/IM", self.arc_executable])
+        else:
+            subprocess.Popen(f"osascript -e 'quit app \"{self.arc_executable}\"'", shell=True)
         print("start")
-        while self.is_application_running("Arc.exe"):
+        while self.is_application_running(self.arc_executable):
             time.sleep(0.1)
         print("done")
 
     def kill_arc(self,):
-        subprocess.call("TASKKILL /F /IM arc.exe", shell=True)
+        if isWindows:
+            subprocess.call(["TASKKILL", "/F", "/IM", self.arc_executable])
+        else:
+            subprocess.Popen(f"pkill -x {self.arc_executable}", shell=True)
 
 
     def open_arc(self,):
-        subprocess.Popen(['arc.exe'])
-
-
-
-if __name__ == "__main__":
-    arc_api = arc_API()
-    arc_api.close_arc()
-    arc_api.set_space_theme_color(0,"blendedSingleColor",[(255,0,255,1)],"light")
-    print(arc_api.get_number_of_spaces())
-    arc_api.set_space_name(0, "aaaaaaaaaaaaaaaaaaaaaaaaa")
-    arc_api.set_space_icon(0, '😍')
-    print(arc_api.get_space_name(0))
-    print(arc_api.get_space_theme_type(0))
-    print(arc_api.get_space_theme_data(0))
+        if isWindows:
+            subprocess.Popen([self.arc_executable])
+        else:
+            subprocess.Popen(f"osascript -e 'tell application \"{self.arc_executable}\" to activate'", shell=True)
