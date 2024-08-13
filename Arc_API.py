@@ -26,7 +26,7 @@ class arc_API:
         if self.isWindows:
             for dir in dirs:
                 if not os.path.isfile(dir):
-                    if "TheBrowserCompany" in dir:
+                    if "TheBrowserCompany.Arc_" in dir:
                         arc_path = path_separator.join((os.path.join(path, dir), "LocalCache", "Local"))
         # finalize true Arc path
         arc_path = path_separator.join((arc_path, "Arc"))
