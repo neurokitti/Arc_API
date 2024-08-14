@@ -13,8 +13,10 @@ def setting_wrapper_function(func):
         self.parse_spaces()
         return result
     return inner_wrapper
+
 class arc_API:
     def __init__(self):
+        self.auto_restart_arc = False
         # following is useful for compatibility with MacOS
         self.isWindows = os.name == "nt"
         path_separator = '\\' if self.isWindows else '/'
@@ -26,7 +28,7 @@ class arc_API:
         if self.isWindows:
             for dir in dirs:
                 if not os.path.isfile(dir):
-                    if "TheBrowserCompany.Arc_" in dir:
+                    if "TheBrowserCompany" in dir:
                         arc_path = path_separator.join((os.path.join(path, dir), "LocalCache", "Local"))
         # finalize true Arc path
         arc_path = path_separator.join((arc_path, "Arc"))
@@ -41,43 +43,36 @@ class arc_API:
         json_data = self.data["sidebar"]["containers"][1]
         index_proper = 0 
         self.spaces_data = []
-        for index, space_data in enumerate(json_data["spaces"]):
+        for index, i in enumerate(json_data["spaces"]):
             if index % 2 != 0:  # Check if the number is odd
-                space_name = None
                 space_theme = None
                 space_theme_data = None
-                if 'windowTheme' not in space_data["customInfo"]:
+                if 'windowTheme' not in i["customInfo"]:
                     #print("empty_theme")
-                    #print("AAAAAA:",space_data)
+                    #print("AAAAAA:",i)
                     space_theme = None
                     space_theme_data = None
-                elif 'blendedSingleColor' in space_data["customInfo"]['windowTheme']["background"]["single"]["_0"]["style"]["color"]["_0"]:
+                elif 'blendedSingleColor' in i["customInfo"]['windowTheme']["background"]["single"]["_0"]["style"]["color"]["_0"]:
                     #print("has blendedSingleColor")
                     space_theme = "blendedSingleColor"
-                    space_theme_data = space_data["customInfo"]['windowTheme']["background"]["single"]["_0"]["style"]["color"]["_0"]
-                elif 'blendedGradient' in space_data["customInfo"]['windowTheme']["background"]["single"]["_0"]["style"]["color"]["_0"]:
+                    space_theme_data = i["customInfo"]['windowTheme']["background"]["single"]["_0"]["style"]["color"]["_0"]
+                elif 'blendedGradient' in i["customInfo"]['windowTheme']["background"]["single"]["_0"]["style"]["color"]["_0"]:
                     #print("has blendedGradient")
                     space_theme = "blendedGradient"
-                    space_theme_data = space_data["customInfo"]['windowTheme']["background"]["single"]["_0"]["style"]["color"]["_0"]
+                    space_theme_data = i["customInfo"]['windowTheme']["background"]["single"]["_0"]["style"]["color"]["_0"]
                 
-                if "iconType" in space_data["customInfo"]:
-                    #print("has icon")
-                    icon = space_data["customInfo"]['iconType']
-                elif "iconType" not in space_data["customInfo"]:
-                    #print("has no icon")
-                    icon = None
-
-                if "title" in space_data:
-                    # only if space has a name
-                    space_name = space_data['title']
-
+                if "iconType" in i["customInfo"]:
+                        #print("has icon")
+                        icon = i["customInfo"]['iconType']
+                elif "iconType" not in i["customInfo"]:
+                        #print("has no icon")
+                        icon = None
                 data = {"space_id": index_proper,
-                    "space_name": space_name,
-                    "space_theme_type": space_theme,
+                    "space_name":i['title'],
+                    "space_theme_type":space_theme,
                     "space_theme_data": space_theme_data,
-                    "space_icon": icon,
+                    "space_icon":icon,
                     }
-                    
                 
                 self.spaces_data.append(data)
                 index_proper +=1
@@ -125,7 +120,7 @@ class arc_API:
                     "modifiers" : {
                     "overlay" : "sand",
                     "noiseFactor" : 1,
-                    "intensityFactor" : 1
+                    "intensityFactor" : intensityFactor
                     },
                     "translucencyStyle" : mode
                 }
@@ -146,11 +141,7 @@ class arc_API:
         return len(self.spaces_data)
     def get_space_name(self, space_id):
         if space_id < self.get_number_of_spaces():
-            # if there is no space_name, can't get one
-            if "space_name" in self.spaces_data[space_id]:
-                return self.spaces_data[space_id]['space_name']
-            else:
-                return None
+            return self.spaces_data[space_id]['space_name']
     def get_space_theme_type(self, space_id):
         if space_id < self.get_number_of_spaces():
             return self.spaces_data[space_id]['space_theme_type']
@@ -160,10 +151,8 @@ class arc_API:
     @setting_wrapper_function
     def set_space_name(self, space_id, space_name):
         if space_id < self.get_number_of_spaces():
-            # if there is no space_name, then can't set one
-            if space_name:
-                space_id = self.index_json_index(space_id)
-                self.data["sidebar"]["containers"][1]["spaces"][space_id]['title'] = str(space_name)
+            space_id = self.index_json_index(space_id)
+            self.data["sidebar"]["containers"][1]["spaces"][space_id]['title'] = str(space_name)
     @setting_wrapper_function
     def set_space_icon(self, space_id, icon):
         if space_id < self.get_number_of_spaces():
@@ -209,3 +198,5 @@ class arc_API:
             subprocess.Popen(self.arc_executable, shell=True)
         else:
             subprocess.Popen(f"osascript -e 'tell application \"{self.arc_executable}\" to activate'", shell=True)
+    def set_auto_restart_arc(self,set):
+        self.auto_restart_arc = set
