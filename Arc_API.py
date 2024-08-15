@@ -1,8 +1,10 @@
+# Built-in libraries
+import os, subprocess, time, json
+# Standard process and system utilities
+import psutil
+# Standard GUI and image related libraries
 from tkinter import *
 from tkinter import colorchooser, messagebox
-import os, json, psutil
-import subprocess
-import time
 
 def setting_wrapper_function(func):
     def inner_wrapper(self, *args, **kwargs):
