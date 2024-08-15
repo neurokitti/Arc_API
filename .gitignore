@@ -1,6 +1,8 @@
 .DS_STORE
 .venv
 __pycache__
+binaries
+*.onefile-build
 *.build
 *.dist
 *.spec
