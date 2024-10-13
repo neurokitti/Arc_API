@@ -138,6 +138,8 @@ class arc_API:
                     },
                     "translucencyStyle" : mode
                 }
+            self.data["sidebar"]["containers"][1]["spaces"][self.index_json_index(space_id)]["customInfo"]["windowTheme"]["background"]["single"]["_0"]["contentOverBackgroundAppearance"] = mode
+            
             print("aaasdf")
             self.update_json()
         else:
