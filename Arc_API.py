@@ -1,5 +1,5 @@
 # Built-in libraries
-import os, subprocess, time, json
+import os, platform, subprocess, time, json
 # Standard process and system utilities
 import psutil
 # Standard GUI and image related libraries
@@ -20,7 +20,7 @@ class arc_API:
     def __init__(self):
         self.auto_restart_arc = False
         # following is useful for compatibility with MacOS
-        self.isWindows = os.name == "nt"
+        self.isWindows = platform.system() == "Windows"
         path_separator = "\\" if self.isWindows else "/"
         # use join function for easier string manipulation + performance
         path = path_separator.join((os.getenv("LOCALAPPDATA"), "Packages")) if self.isWindows else path_separator.join((os.getenv("HOME"), "Library", "Application Support"))
