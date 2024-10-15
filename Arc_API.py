@@ -109,11 +109,11 @@ class arc_API:
         
         # Check if 'windowTheme' is not in space_data["customInfo"]
         if "windowTheme" not in space_data["customInfo"]:
-            space_data["customInfo"] = {"windowTheme": json_data}
+            space_data["customInfo"]["windowTheme"] = json_data
 
         # Ensure background exists within windowTheme
         if "background" not in space_data["customInfo"]["windowTheme"]:
-            space_data["customInfo"] = {"windowTheme": json_data}
+            space_data["customInfo"]["windowTheme"] = json_data
 
         # Now safely access windowTheme and continue with your logic
         self.gradientData = space_data["customInfo"]["windowTheme"]["background"]["single"]["_0"]["style"]["color"]["_0"]
