@@ -95,60 +95,82 @@ class arc_API:
         return self.spaces_data
     def set_space_theme_color(self,space_id, type, rgba,mode, noiseFactor=0.3,intensityFactor=0.1,):
         print(rgba)
-        if self.get_space_theme_type(space_id) != None:
-            if isinstance(rgba, tuple):
-                rgba = [rgba]
-            self.gradientData = self.data["sidebar"]["containers"][1]["spaces"][self.index_json_index(space_id)]["customInfo"]["windowTheme"]["background"]["single"]["_0"]["style"]["color"]["_0"]
-            if type == "blendedGradient":
-                colors = []
-                for color in rgba:
-                    colors.append({"red": (color[0] / 255), "green": (color[1] / 255), "blue": (color[2] / 255), "alpha": color[3], "colorSpace": "extendedSRGB"},)
-                print(colors)
-                if (not "blendedGradient" in self.gradientData):
-                    self.gradientData["blendedGradient"] = self.gradientData.pop("blendedSingleColor")
-                
-                self.gradientData["blendedGradient"]["_0"] = {
-                    "overlayColors": [],
-                    "translucencyStyle": mode,
-                    "wheel": {
-                        "complimentary": {}
-                    },
-                    "baseColors": colors,
-                    "modifiers": {"intensityFactor": intensityFactor, "overlay": "grain", "noiseFactor": noiseFactor}
-                }
-                self.data["sidebar"]["containers"][1]["spaces"][self.index_json_index(space_id)]["customInfo"]["windowTheme"]["background"]["single"]["_0"]["contentOverBackgroundAppearance"] = mode
+    
+        if isinstance(rgba, tuple):
+            rgba = [rgba]
+        space_data = self.data["sidebar"]["containers"][1]["spaces"][self.index_json_index(space_id)]
 
-            if type == "blendedSingleColor":
-                r,g,b,a = rgba[0]
-                print("A:", a)
-                print("b:", b)
-                print("g:", g)
-                print("r:", r)
-                if (not "blendedSingleColor" in self.gradientData):
-                    self.gradientData["blendedSingleColor"] = self.gradientData.pop("blendedGradient")
-                self.gradientData["blendedSingleColor"]["_0"] = {
-                    "color": {
-                        "alpha": a,
-                        "green": g / 255,
-                        "blue": b / 255,
-                        "red": r / 255,
-                        "colorSpace": "extendedSRGB"
-                    },
-                    "modifiers" : {
-                        "overlay" : "sand",
-                        "noiseFactor" : 1,
-                        "intensityFactor" : intensityFactor
-                    },
-                    "translucencyStyle" : mode
-                }
-                self.data["sidebar"]["containers"][1]["spaces"][self.index_json_index(space_id)]["customInfo"]["windowTheme"]["background"]["single"]["_0"]["contentOverBackgroundAppearance"] = mode
+        json_file_path = 'Arc_API/space.json'
 
-            if type == "none":
-                self.data["sidebar"]["containers"][1]["spaces"][self.index_json_index(space_id)]["customInfo"]["windowTheme"] = {}
-            print("aaasdf")
-            self.update_json()
-        else:
-            print("blank space. could not set!")
+        # Load the contents of the JSON file
+        with open(json_file_path, 'r') as json_file:
+            json_data = json.load(json_file)
+
+        
+        # Check if 'windowTheme' is not in space_data["customInfo"]
+        if "windowTheme" not in space_data["customInfo"]:
+            space_data["customInfo"] = {"windowTheme": json_data}
+
+        # Ensure background exists within windowTheme
+        if "background" not in space_data["customInfo"]["windowTheme"]:
+            space_data["customInfo"] = {"windowTheme": json_data}
+
+        # Now safely access windowTheme and continue with your logic
+        self.gradientData = space_data["customInfo"]["windowTheme"]["background"]["single"]["_0"]["style"]["color"]["_0"]
+
+
+
+
+
+        if type == "blendedGradient":
+            colors = []
+            for color in rgba:
+                colors.append({"red": (color[0] / 255), "green": (color[1] / 255), "blue": (color[2] / 255), "alpha": color[3], "colorSpace": "extendedSRGB"},)
+            print(colors)
+            if (not "blendedGradient" in self.gradientData):
+                self.gradientData["blendedGradient"] = self.gradientData.pop("blendedSingleColor")
+            
+            self.gradientData["blendedGradient"]["_0"] = {
+                "overlayColors": [],
+                "translucencyStyle": mode,
+                "wheel": {
+                    "complimentary": {}
+                },
+                "baseColors": colors,
+                "modifiers": {"intensityFactor": intensityFactor, "overlay": "grain", "noiseFactor": noiseFactor}
+            }
+            self.data["sidebar"]["containers"][1]["spaces"][self.index_json_index(space_id)]["customInfo"]["windowTheme"]["background"]["single"]["_0"]["contentOverBackgroundAppearance"] = mode
+
+        if type == "blendedSingleColor":
+            r,g,b,a = rgba[0]
+            print("A:", a)
+            print("b:", b)
+            print("g:", g)
+            print("r:", r)
+            if (not "blendedSingleColor" in self.gradientData):
+                self.gradientData["blendedSingleColor"] = self.gradientData.pop("blendedGradient")
+            self.gradientData["blendedSingleColor"]["_0"] = {
+                "color": {
+                    "alpha": a,
+                    "green": g / 255,
+                    "blue": b / 255,
+                    "red": r / 255,
+                    "colorSpace": "extendedSRGB"
+                },
+                "modifiers" : {
+                    "overlay" : "sand",
+                    "noiseFactor" : 1,
+                    "intensityFactor" : intensityFactor
+                },
+                "translucencyStyle" : mode
+            }
+            self.data["sidebar"]["containers"][1]["spaces"][self.index_json_index(space_id)]["customInfo"]["windowTheme"]["background"]["single"]["_0"]["contentOverBackgroundAppearance"] = mode
+
+        if type == "none":
+            self.data["sidebar"]["containers"][1]["spaces"][self.index_json_index(space_id)]["customInfo"]["windowTheme"] = {}
+        print("aaasdf")
+        self.update_json()
+
     def json_index_to_index(self, json_index):
         proper_index = json_index + (json_index - 1)
         return proper_index
