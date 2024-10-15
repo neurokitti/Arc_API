@@ -69,6 +69,7 @@ class arc_API:
                 if "title" in space_data:
                     #print("has name")
                     space_name = space_data["title"]
+                    print(space_name)
                 elif "title" not in space_data:
                     #print("has no name")
                     space_name = None
@@ -115,6 +116,8 @@ class arc_API:
                     "baseColors": colors,
                     "modifiers": {"intensityFactor": intensityFactor, "overlay": "grain", "noiseFactor": noiseFactor}
                 }
+                self.data["sidebar"]["containers"][1]["spaces"][self.index_json_index(space_id)]["customInfo"]["windowTheme"]["background"]["single"]["_0"]["contentOverBackgroundAppearance"] = mode
+
             if type == "blendedSingleColor":
                 r,g,b,a = rgba[0]
                 print("A:", a)
@@ -138,8 +141,10 @@ class arc_API:
                     },
                     "translucencyStyle" : mode
                 }
-            self.data["sidebar"]["containers"][1]["spaces"][self.index_json_index(space_id)]["customInfo"]["windowTheme"]["background"]["single"]["_0"]["contentOverBackgroundAppearance"] = mode
-            
+                self.data["sidebar"]["containers"][1]["spaces"][self.index_json_index(space_id)]["customInfo"]["windowTheme"]["background"]["single"]["_0"]["contentOverBackgroundAppearance"] = mode
+
+            if type == "none":
+                self.data["sidebar"]["containers"][1]["spaces"][self.index_json_index(space_id)]["customInfo"]["windowTheme"] = {}
             print("aaasdf")
             self.update_json()
         else:
@@ -162,6 +167,11 @@ class arc_API:
                 return self.spaces_data[space_id]["space_name"]
             else:
                 return None
+    def get_space_icon(self, space_id):
+        if space_id < self.get_number_of_spaces() and self.spaces_data[space_id]["space_icon"] != None:
+            return self.spaces_data[space_id]["space_icon"]["emoji_v2"]
+        else:
+            return None
     def get_space_theme_type(self, space_id):
         if space_id < self.get_number_of_spaces():
             return self.spaces_data[space_id]["space_theme_type"]
