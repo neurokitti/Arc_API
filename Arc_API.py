@@ -191,7 +191,11 @@ class arc_API:
                 return None
     def get_space_icon(self, space_id):
         if space_id < self.get_number_of_spaces() and self.spaces_data[space_id]["space_icon"] != None:
-            return self.spaces_data[space_id]["space_icon"]["emoji_v2"]
+            try:
+                return self.spaces_data[space_id]["space_icon"]["emoji_v2"]
+            except:
+                if self.spaces_data[space_id]["space_icon"]["icon"] == "planet":
+                    return "🌍"
         else:
             return None
     def get_space_theme_type(self, space_id):
